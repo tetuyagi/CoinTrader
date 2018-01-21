@@ -1,12 +1,17 @@
+# -*- coding: utf-8 -*-
 from binance.client import Client
 from binance.websockets import BinanceSocketManager
 
+from msvcrt import getch
 import json
+import sys
 
 
 api_key = "ffltNnyKSclwexlhMgu9VGIGCcFfqcov4wA3pBLsDxMiv253OoKu9PNEvnErSGIY"
 api_secret = "CDKAajuQfq4Va86degtw2HtLRcpVunaKrlYm20mpfGhjbvFIKl0SvCbpLzgAbvUF"
-client = Client(api_key, api_secret, {"verify":False, "timeout":20})
+# client = Client(api_key, api_secret, {"verify": False, "timeout": 20})
+client = Client(api_key, api_secret)
+
 
 class Peyload:
     def __init__(self):
@@ -21,7 +26,6 @@ class Peyload:
         self.tradeTime = 0
         self.isMarker = False
         self.flag = False
-
 
     @staticmethod
     def parse(jsonText):
@@ -38,17 +42,17 @@ class Peyload:
             self.eventType = jsonObj["e"]
             self.eventTime = jsonObj["E"]
             self.symbol = jsonObj["s"]
-            self.aggregateTradeId= jsonObj["a"]
+            self.aggregateTradeId = jsonObj["a"]
 
-            self.price = float(jsonObj["p"]) #誤差大丈夫？
+            self.price = float(jsonObj["p"])  # 誤差大丈夫？
 
-            self.quantity = float(jsonObj["q"]) #10億超える？
-            #self.firstTradeId = jsonObj["f"]
-            #self.lastTradeId = jsonObj["l"]
+            self.quantity = float(jsonObj["q"])  # 10億超える？
+            # self.firstTradeId = jsonObj["f"]
+            # self.lastTradeId = jsonObj["l"]
             self.tradeTime = jsonObj["T"]
             self.isMarker = jsonObj["m"]
             self.flag = jsonObj["M"]
-            
+
             print("price : " + str(self.price))
             print("parse succeeded")
             return self
@@ -57,14 +61,20 @@ class Peyload:
             print("parse error : " + str(e))
 
 
-
 def process_message(msg):
+    print("process")
+    key = ord(getch())
+    if(key == 27):  # escape key
+        bm.close()
+        sys.exit()
+
     if msg['e'] == 'error':
         print("error")
         print(msg)
 
         # close and restart the socket
         bm.close()
+        sys.exit()
 
     else:
         print("message type: {}".format(msg['e']))
@@ -72,10 +82,9 @@ def process_message(msg):
         peyload = Peyload.parse(str(msg))
 
 
-
 bm = BinanceSocketManager(client)
 
 coin = "BNBBTC"
 conn_key = bm.start_trade_socket(coin, process_message)
 
-bm.start() 
+bm.start()
