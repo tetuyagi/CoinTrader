@@ -9,6 +9,8 @@ from Helper import *
 from binance.helpers import *
 from Mailer import Mailer
 
+import datetime
+
 import time
 
 
@@ -25,9 +27,14 @@ def judge(client, symbol, maList, startTime, endTime):
     ma25 = maList[1]
     ma99 = maList[2]
 
+
     shortMA = ma7.averageList
+    if(len(shortMA) <= 0):
+        return eventList
     shortMA.reverse()
     longMA = ma25.averageList
+    if(len(longMA) <= 0):
+        return eventList
     longMA.reverse()
 
     if(isGoldenCross(shortMA, longMA, startTime, endTime)):
@@ -86,16 +93,11 @@ def checkSymbol(client, symbol):
     return eventList
 
 
-mailer = Mailer()
-subject = "仮想通貨　速報"
-
-bc = BinanceClient()
-interval = 2 * 3600  # 2時間
-
-while(True):
+def check():
     eventList = []
     symbolList = bc.getSymbolList()
 
+    # 全てのシンボルを調べる
     for i in range(len(symbolList)):
         symbol = symbolList[i]
         el = checkSymbol(bc, symbol)
@@ -103,6 +105,7 @@ while(True):
         for j in range(len(el)):
             eventList.append(el[j])
 
+    # イベントが起こっていればメールを送る
     if(len(eventList) != 0):
         body = ""
         for i in range(len(eventList)):
@@ -111,4 +114,58 @@ while(True):
 
         mailer.send(subject, body)
 
+
+
+# main
+mailer = Mailer()
+subject = "仮想通貨　速報"
+
+bc = BinanceClient()
+interval = 2 * 3600  # 2時間
+
+timeTable = [
+    1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23
+]
+
+t = datetime.datetime.now().hour
+prevHour = 0
+nowHour = 0
+
+checkPoint = 0
+checkPointIndex = 0
+
+
+for i in range(len(timeTable)):
+    start = timeTable[i]
+
+    if(i == len(timeTable)-1):
+        end = 25
+    else:
+        end = timeTable[i + 1]
+
+    if(t in range(start, end)):
+        checkPoint = end
+        checkPointIndex = i + 1
+        break
+
+
+
+while(True):
+    # timezone asia/tokyo
+    check()
+    """
+    dt = datetime.datetime.now()
+    hour = dt.hour
+
+    if(hour > checkPoint):
+
+        checkPoint = timeTable[checkPointIndex + 1]
+    """
+    # 1分
     time.sleep(interval)
+
+
+
+    # 今の時間を調べる。
+    # タイムテーブルを超えているか調べる。
+    # 超えていればcheck

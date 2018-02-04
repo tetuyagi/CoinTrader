@@ -24,11 +24,11 @@ def countCross(pointsA, pointsB):
 
 
 def isCrossToUp(pointsA, pointsB, startTime, endTime):
-
     pointsA = extractPoints(pointsA, startTime, endTime)
     pointsB = extractPoints(pointsB, startTime, endTime)
 
-
+    if(len(pointsA) == 0 or len(pointsB) == 0):
+        return False
 
     # pointAがpointBの下から始まっていないものは除く
     if(pointsA[0].y >= pointsB[0].y):
@@ -44,6 +44,9 @@ def isCrossToUp(pointsA, pointsB, startTime, endTime):
 def isCrossToDown(pointsA, pointsB, startTime, endTime):
     pointsA = extractPoints(pointsA, startTime, endTime)
     pointsB = extractPoints(pointsB, startTime, endTime)
+
+    if(len(pointsA) == 0 or len(pointsB) == 0):
+        return False
 
     # pointAがpointBの上から始まっていないものは除く
     if(pointsA[0].y <= pointsB[0].y):

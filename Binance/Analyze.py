@@ -20,6 +20,7 @@ class MA:
 
         # rangeがpointListの長さ以上になっていないかチェック
         if(averageListLength < 0):
+            print("doesnt have enough point to make ma")
             return
 
         for i in range(averageListLength):

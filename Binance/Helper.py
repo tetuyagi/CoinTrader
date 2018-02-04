@@ -18,14 +18,19 @@ def extractPoints(points, startTime, endTime):
     print("points[0].x : {}".format(points[0].x))
     print("points[len(points)-1].x : {}".format(points[len(points)-1].x))
     """
+    pointList = []
     startIndex = __getStartIndex(points, startTime)
+    if(startIndex == -1):
+        return pointList
+
     endIndex = __getEndIndex(points, endTime, startIndex)
+    if(endIndex == -1):
+        return pointList
     """
     print("startIndex : {}".format(startIndex))
     print("endIndex : {}".format(endIndex))
     """
 
-    pointList = []
     for i in range(startIndex, endIndex+1):
         pointList.append(points[i])
 
